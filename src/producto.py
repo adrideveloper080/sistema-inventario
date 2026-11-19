@@ -9,7 +9,7 @@ class Producto:
         print(f"Código: {self.codigo}")
         print(f"Nombre: {self.nombre}")
         print(f"Precio: ${self.precio}")
-        print("Existencia: ERROR")
+        print(f"Existencia: {self.existencia}")
 
 
 
