@@ -50,7 +50,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          fingerprint: SHA256:mUFyxwXMaFfSs5WNmbmKkg42JozIHxBWS/tXl6Ilsqc
+          fingerprint: SHA256:qyyl5t+SJPrT4RXsVQxG8BJ2cGlI01ZCt4InUotwBnk
           source: sistema-inventario-${{ inputs.version }}.zip
           target: /home/adri/sistema-inventario/paquetes/
 
@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT }}
-          fingerprint: SHA256:mUFyxwXMaFfSs5WNmbmKkg42JozIHxBWS/tXl6Ilsqc
+          fingerprint: SHA256:qyyl5t+SJPrT4RXsVQxG8BJ2cGlI01ZCt4InUotwBnk
           envs: RELEASE_VERSION
           script: |
             set -eu
