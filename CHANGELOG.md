@@ -1,13 +1,16 @@
 # Historial de versiones
 
-## v1.1.0 - En preparación
+## v1.1.0 - 2026-11-19
 
-- Incorporación del encabezado "Sistema de Inventario v1.1.0" al ejecutar el programa.
+- Incorporación del encabezado "Sistema de Inventario v1.1.0".
 - Resultado de pruebas locales: 7 ejecutadas, todas satisfactorias.
-- Versión destinada a la práctica de despliegue y recuperación.
-
-
-
+- Publicación automática en GitHub Releases.
+- Paquete generado: sistema-inventario-v1.1.0.zip.
+- Commit de la versión: e327cbc.
+- Despliegue satisfactorio en Ubuntu mediante GitHub Actions.
+- Resultado de verificaciones en destino: 3 satisfactorias.
+- Ejercicio posterior: falla simulada en la copia instalada y recuperación manual de v1.0.2.
+- El paquete publicado de v1.1.0 permanece intacto.
 
 ## v1.0.2 - 2026-11-18
 
