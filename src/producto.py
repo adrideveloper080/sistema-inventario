@@ -12,7 +12,7 @@ class Producto:
         print(f"Existencia: {self.existencia}")
 
 
-
 if __name__ == "__main__":
+    print("Sistema de Inventario v1.1.0")
     producto = Producto("P001", "Teclado", 350.00, 20)
     producto.mostrar_informacion()

@@ -1,5 +1,12 @@
 # Historial de versiones
 
+## v1.1.0 - En preparación
+
+- Incorporación del encabezado "Sistema de Inventario v1.1.0" al ejecutar el programa.
+- Resultado de pruebas locales: 7 ejecutadas, todas satisfactorias.
+- Versión destinada a la práctica de despliegue y recuperación.
+
+
 
 
 ## v1.0.2 - 2026-11-18
