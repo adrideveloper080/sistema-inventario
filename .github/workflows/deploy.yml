@@ -1,0 +1,107 @@
+name: Despliegue del Sistema de Inventario
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version publicada que se desea desplegar
+        required: true
+        default: v1.0.2
+        type: choice
+        options:
+          - v1.0.2
+          - v1.0.0
+
+permissions:
+  contents: read
+
+concurrency:
+  group: despliegue-inventario
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+
+    steps:
+      - name: Descargar paquete desde GitHub Releases
+        run: |
+          set -euo pipefail
+          archivo="sistema-inventario-${RELEASE_VERSION}.zip"
+          curl -fL --retry 3 -o "$archivo" \
+            "https://github.com/adrideveloper080/sistema-inventario/releases/download/${RELEASE_VERSION}/${archivo}"
+          unzip -t "$archivo"
+          sha256sum "$archivo"
+
+      - name: Conectar a Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          ping: ${{ secrets.DEPLOY_HOST }}
+
+      - name: Transferir paquete al servidor
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          fingerprint: SHA256:mUFyxwXMaFfSs5WNmbmKkg42JozIHxBWS/tXl6Ilsqc
+          source: sistema-inventario-${{ inputs.version }}.zip
+          target: /home/adri/sistema-inventario/paquetes/
+
+      - name: Instalar y verificar en Ubuntu
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          fingerprint: SHA256:mUFyxwXMaFfSs5WNmbmKkg42JozIHxBWS/tXl6Ilsqc
+          envs: RELEASE_VERSION
+          script: |
+            set -eu
+
+            base="$HOME/sistema-inventario"
+            paquete="$base/paquetes/sistema-inventario-${RELEASE_VERSION}.zip"
+            destino="$base/version-${RELEASE_VERSION}"
+
+            echo "Servidor de destino:"
+            hostname
+            whoami
+            python3 --version
+
+            echo "Paquete recibido:"
+            ls -lh "$paquete"
+            sha256sum "$paquete"
+            unzip -t "$paquete"
+
+            mkdir -p "$destino"
+            unzip -o "$paquete" -d "$destino"
+            cd "$destino"
+
+            echo "Ejecucion del Sistema de Inventario:"
+            python3 src/producto.py
+
+            echo "Verificaciones del despliegue:"
+            python3 - <<'PY'
+            from src.producto import Producto
+            from src.busqueda import buscar_producto
+
+            mouse = Producto("P002", "Mouse", 180, 5)
+            assert (mouse.codigo, mouse.nombre, mouse.precio, mouse.existencia) == ("P002", "Mouse", 180, 5)
+            print("OK: producto creado correctamente")
+            assert buscar_producto([mouse], "MOUSE") == [mouse]
+            print("OK: busqueda sin distinguir mayusculas")
+            assert buscar_producto([mouse], "Monitor") == []
+            print("OK: busqueda sin coincidencias")
+            print("Verificacion: 3 comprobaciones satisfactorias")
+            PY
+
+            ln -sfn "$destino" "$base/actual"
+            echo "Version activa: $RELEASE_VERSION"
+            readlink -f "$base/actual"
